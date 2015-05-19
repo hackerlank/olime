@@ -9,7 +9,7 @@ int main() {
     u32string unicode_str;
 
     bool result;
-    char32_t buff32[kMaxStrLen] = {0};
+    u32char buff32[kMaxStrLen] = {0};
     buff32[0] = 0x20C30;
     unicode_str.assign(buff32);
 

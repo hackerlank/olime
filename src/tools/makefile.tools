@@ -1,0 +1,3 @@
+include ../makefile.d
+
+tools: config.o charset.o

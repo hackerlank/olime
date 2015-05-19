@@ -8,31 +8,6 @@ namespace tools {
 namespace charset {
 
 
-// 单个字符的大小头转换
-// param[in] src_char: 源字符
-// return: 目标字符
-template <typename T>
-T ReverseChar(const T &src_char) {
-    size_t bytes = sizeof(T);
-    T des_char = 0;
-    for (size_t i = 0; i < bytes; ++i) {
-        des_char = des_char << 8;
-        char8_t* add = (char8_t*)(&src_char);
-        des_char |= *((char8_t*)(&src_char) + i);
-    }
-    return des_char;
-}
-
-// 字符串的大头转小头或小头转大头
-// param[in/out] str: 需要进行大小头转换的字符串
-template <typename T>
-void ReverseBytes(T &str) {
-    for (size_t idx_char = 0; idx_char < str.length(); ++idx_char) {
-        str[idx_char] = ReverseChar(str.c_str()[idx_char]);
-    }
-}
-
-
 // Unicode (hex)   | UTF-8 (bin)
 // 000000 - 00007F | 0XXXXXXX
 // 000080 - 0007FF | 110XXXXX 10XXXXXX
@@ -40,9 +15,9 @@ void ReverseBytes(T &str) {
 // 010000 - 10FFFF | 11110XXX 10XXXXXX 10XXXXXX 10XXXXXX
 bool UnicodeToUtf8(const u32string &unicode_str, u8string &str8) {
     size_t idx_8 = 0;
-    char8_t buff8[kMaxStrLen] = {0}; // 临时空间
+    u8char buff8[kMaxStrLen] = {0}; // 临时空间
     for (size_t idx_uni = 0; idx_uni < unicode_str.length(); ++idx_uni) {
-        char32_t char_uni = unicode_str[idx_uni];
+        u32char char_uni = unicode_str[idx_uni];
         size_t offset = 0;
         if (char_uni < 0x00000080) {
             if (idx_8 < kMaxStrLen) {
@@ -94,13 +69,13 @@ bool UnicodeToUtf8(const u32string &unicode_str, u8string &str8) {
 bool UnicodeToUtf16(const u32string &unicode_str, u16string &str16,
         bool is_be) {
     size_t idx_16 = 0;
-    char16_t buff16[kMaxStrLen] = {0}; // 临时空间
+    u16char buff16[kMaxStrLen] = {0}; // 临时空间
     for (size_t idx_uni = 0; idx_uni < unicode_str.length(); ++idx_uni) {
-        char32_t char_uni = unicode_str[idx_uni];
+        u32char char_uni = unicode_str[idx_uni];
         if (char_uni < 0x00010000) {
             if (idx_16 < kMaxStrLen) { // 判断是否超出了最大长度
-                char16_t char16 = char_uni & 0x0000FFFF;
-                buff16[idx_16++] = static_cast<char16_t>(char16);
+                u16char char16 = char_uni & 0x0000FFFF;
+                buff16[idx_16++] = static_cast<u16char>(char16);
             } else {
                 return false;
             }
@@ -108,11 +83,11 @@ bool UnicodeToUtf16(const u32string &unicode_str, u16string &str16,
             char_uni -= 0x00010000; // 首先减去 0x00010000
             if (idx_16 < kMaxStrLen - 1) { // 判断是否超出了最大长度
                 // 高16位
-                char32_t char16_high = 0x0000D800 + (char_uni >> 10);
-                buff16[idx_16++] = static_cast<char16_t>(char16_high);
+                u32char char16_high = 0x0000D800 + (char_uni >> 10);
+                buff16[idx_16++] = static_cast<u16char>(char16_high);
                 // 低16位
-                char32_t char16_low = 0x0000DC00 + (char_uni & 0x000003FF);
-                buff16[idx_16++] = static_cast<char16_t>(char16_low);
+                u32char char16_low = 0x0000DC00 + (char_uni & 0x000003FF);
+                buff16[idx_16++] = static_cast<u16char>(char16_low);
             } else {
                 return false;
             }
@@ -134,12 +109,12 @@ bool UnicodeToUtf16(const u32string &unicode_str, u16string &str16,
 bool Utf16ToUnicode(const u16string &str16, u32string &unicode_str,
         bool is_be) {
     size_t idx_uni = 0;
-    char32_t buff_uni[kMaxStrLen] = {0}; // 临时空间
+    u32char buff_uni[kMaxStrLen] = {0}; // 临时空间
 
     // 先转为大头数据
     u16string str16be;
     if (! is_be) {
-        char16_t buff16[kMaxStrLen] = {0};
+        u16char buff16[kMaxStrLen] = {0};
         str16.copy(buff16, kMaxStrLen);
         str16be.assign(buff16);
         ReverseBytes(str16be);
@@ -148,7 +123,7 @@ bool Utf16ToUnicode(const u16string &str16, u32string &unicode_str,
     }
 
     for (size_t idx_16 = 0; idx_16 < str16be.length(); ++idx_16) {
-        char16_t char16 = str16be[idx_16];
+        u16char char16 = str16be[idx_16];
 
         if (idx_uni >= kMaxStrLen) { // 空间不够
             return false;
@@ -156,12 +131,12 @@ bool Utf16ToUnicode(const u16string &str16, u32string &unicode_str,
 
         // 编码过程
         if (0xD800 <= char16 && char16 <= 0xDFFF) { // 代理区
-            buff_uni[idx_uni] = static_cast<char32_t>(char16 & 0x03FF) << 10;
-            char16_t char16_next = str16be[++idx_16];
-            buff_uni[idx_uni] += static_cast<char32_t>(char16_next & 0x03FF);
+            buff_uni[idx_uni] = static_cast<u32char>(char16 & 0x03FF) << 10;
+            u16char char16_next = str16be[++idx_16];
+            buff_uni[idx_uni] += static_cast<u32char>(char16_next & 0x03FF);
             buff_uni[idx_uni] += 0x00010000;
         } else {
-            buff_uni[idx_uni] = static_cast<char32_t>(char16) & 0x0000FFFF;
+            buff_uni[idx_uni] = static_cast<u32char>(char16) & 0x0000FFFF;
         }
     }
 
@@ -178,10 +153,10 @@ bool Utf16ToUnicode(const u16string &str16, u32string &unicode_str,
 // 010000 - 10FFFF | 11110XXX 10XXXXXX 10XXXXXX 10XXXXXX
 bool Utf8ToUnicode(const u8string &str8, u32string &unicode_str) {
     size_t idx_uni = 0;
-    char32_t buff_uni[kMaxStrLen] = {0};
+    u32char buff_uni[kMaxStrLen] = {0};
 
     for (size_t idx_8 = 0; idx_8 < str8.length(); ++idx_8) {
-        char8_t char8 = str8[idx_8];
+        u8char char8 = str8[idx_8];
         size_t offset = 0;
 
         if (idx_uni >= kMaxStrLen) { // 空间不够
@@ -190,23 +165,23 @@ bool Utf8ToUnicode(const u8string &str8, u32string &unicode_str) {
 
         // 编码过程
         if (char8 < 0x80) {
-            buff_uni[idx_uni] = static_cast<char32_t>(char8);
+            buff_uni[idx_uni] = static_cast<u32char>(char8);
         } else if (char8 < 0xE0) {
-            buff_uni[idx_uni] = static_cast<char32_t>(char8 & 0x1F);
+            buff_uni[idx_uni] = static_cast<u32char>(char8 & 0x1F);
             offset = 1;
         } else if (char8 < 0xF0) {
-            buff_uni[idx_uni] = static_cast<char32_t>(char8 & 0x0F);
+            buff_uni[idx_uni] = static_cast<u32char>(char8 & 0x0F);
             offset = 2;
         } else if (char8 < 0xF8) {
-            buff_uni[idx_uni] = static_cast<char32_t>(char8 & 0x07);
+            buff_uni[idx_uni] = static_cast<u32char>(char8 & 0x07);
             offset = 3;
         }
 
         // 偏移量
         for (size_t idx_offset = 0; idx_offset < offset; ++idx_offset) {
             buff_uni[idx_uni] = buff_uni[idx_uni] << 6;
-            char8_t char8_next = str8[++idx_8];
-            buff_uni[idx_uni] |= static_cast<char32_t>(char8_next & 0x3F);
+            u8char char8_next = str8[++idx_8];
+            buff_uni[idx_uni] |= static_cast<u32char>(char8_next & 0x3F);
         }
 
         idx_uni++;
@@ -222,7 +197,7 @@ bool Utf32ToUnicode(const u32string &str32, u32string &unicode_str,
         return false;
     }
 
-    char32_t buff32[kMaxStrLen] = {0};
+    u32char buff32[kMaxStrLen] = {0};
     str32.copy(buff32, kMaxStrLen);
     unicode_str.assign(buff32);
     if (! is_be) {
@@ -238,7 +213,7 @@ bool UnicodeToUtf32(const u32string &unicode_str, u32string &str32,
         return false;
     }
 
-    char32_t buff32[kMaxStrLen] = {0};
+    u32char buff32[kMaxStrLen] = {0};
     unicode_str.copy(buff32, kMaxStrLen);
     str32.assign(buff32);
     if (! is_be) {
