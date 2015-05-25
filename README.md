@@ -20,6 +20,7 @@
 
 本代码引用了部分第三方库, 其中包括:
 
-### 1. [glog](https://code.google.com/p/google-glog/)
+### 1. [easylogging++](https://github.com/easylogging/easyloggingpp)
 
-Google 的日志库, 具有高效, 跨平台的特性. 使用方法请看[这里](http://google-glog.googlecode.com/svn/trunk/doc/glog.html)
+本来是使用[glog](https://code.google.com/p/google-glog/)的，但是由于glog过于庞大，而我们对于日志的需求并没有想象中那么强烈，
+所以改用 easylogging++。easylogging++ 的名字真是拗口，但是人家就叫这个也只能这样了。easylogging++需要使用 C++ 11。

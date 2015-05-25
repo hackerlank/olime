@@ -5,6 +5,6 @@
 int main() {
     tools::config::Parser parser;
     parser.Load("config.ini");
-    std::cout << parser["kaka"]["c"] << std::endl;
+    std::cout << parser["log"]["format"] << std::endl;
     return 0;
 }
