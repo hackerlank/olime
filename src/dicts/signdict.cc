@@ -1,7 +1,5 @@
 #include <fstream>
 #include "signdict.h"
-#include <iostream>
-using namespace std;
 
 
 dicts::SignDict::SignDict() {
