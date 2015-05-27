@@ -14,6 +14,7 @@
 
 #include <string>
 #include <map>
+#include "define.h"
 
 
 namespace tools {
@@ -50,7 +51,7 @@ public:
     // 读取配置文件, 同时会生成 section_dict_
     // param[in] filename: 文件名称 (包含路径, 仅支持 ini 文件格式)
     // return: 是否读取成功
-    bool Load(const std::string &filename);
+    ErrCode Load(const std::string &filename);
 };
 
 

@@ -16,14 +16,14 @@ std::string Parser::Trim(const std::string& src_str, const std::string& invalid_
 }
 
 
-bool Parser::Load(const std::string& ini_filename) {
+ErrCode Parser::Load(const std::string& ini_filename) {
     std::fstream f_ini(ini_filename.c_str());
     if (! f_ini) {
-        return false;
+        return ErrInternalErr;
     }
 
     std::string line;
-    std::string section("unknown_section");
+    std::string section("default");
     while (getline(f_ini, line)) {
         // 去除注释
         size_t sharp_index = line.find_first_of("#");
@@ -57,7 +57,7 @@ bool Parser::Load(const std::string& ini_filename) {
     }
 
     f_ini.close();
-    return true;
+    return ErrSuccess;
 }
 
 

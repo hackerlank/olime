@@ -1,5 +1,5 @@
 CC := g++
-MODULES := tools
+MODULES := tools dicts olime
 
 TOP_DIR := $(PWD)
 INCLUDES_DIR := $(TOP_DIR)/includes
@@ -7,6 +7,7 @@ TEST_DIR := $(TOP_DIR)/test
 TEST_RELEASE_DIR := $(TEST_DIR)/release
 OBJECTS_DIR := $(TOP_DIR)/objs
 LIBS_DIR := $(TOP_DIR)/../libs
+OUTPUT_DIR := $(TOP_DIR)/output
 
 CPPFLAGS := -std=c++11
 INCLUDES := -I$(INCLUDES_DIR)

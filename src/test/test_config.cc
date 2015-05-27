@@ -4,7 +4,7 @@
 
 int main() {
     tools::config::Parser parser;
-    parser.Load("config.ini");
-    std::cout << parser["log"]["format"] << std::endl;
+    ErrCode result = parser.Load("config.ini");
+    std::cout << result << " " << parser["log"]["format"] << std::endl;
     return 0;
 }

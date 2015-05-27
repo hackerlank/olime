@@ -1,0 +1,6 @@
+include ../makefile.d
+
+OBJECTS_NAME := $(wildcard $(OBJECTS_DIR)/*.o)
+
+olime: olime.cc $(OBJECTS_NAME)
+	@$(CC) $(CPPFLAGS) $(INCLUDES) $(OBJECTS) $< -o $(OUTPUT_DIR)/$@ $(OBJECTS_NAME)

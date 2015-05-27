@@ -8,7 +8,7 @@ int main() {
     u32string str32;
     u32string unicode_str;
 
-    bool result;
+    ErrCode result;
     u32char buff32[kMaxStrLen] = {0};
     buff32[0] = 0x20C30;
     unicode_str.assign(buff32);
