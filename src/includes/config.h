@@ -35,22 +35,28 @@ private:
     std::map< std::string, std::map<std::string, std::string> > section_dict_;
 
     // 处理字符串的首尾无效字符
-    // param[in] src_str: 源字符串
-    // param[in] invalid_chars: 定义为无效的字符
-    // return: 返回已经去除首尾无效字符的字符串
+    // 参数:
+    //      src_str: 源字符串
+    //      invalid_chars: 定义为无效的字符
+    // 返回:
+    //      返回已经去除首尾无效字符的字符串
     std::string Trim(const std::string& src_str, const std::string& invalid_chars="\t\n ");
 
 public:
 
     // 获取对应 section 的结果
-    // param[in] section: section 的名称
-    // return: 返回一个 section 的结果
-    //         如果 section 不存在也不会报错, 只会返回一个空 map
+    // 参数
+    //      section: section 的名称
+    // 返回:
+    //      返回一个 section 的结果
+    //      如果 section 不存在也不会报错, 只会返回一个空 map
     std::map<std::string, std::string> operator[](const std::string& section);
 
     // 读取配置文件, 同时会生成 section_dict_
-    // param[in] filename: 文件名称 (包含路径, 仅支持 ini 文件格式)
-    // return: 是否读取成功
+    // 参数:
+    //      filename: 文件名称 (包含路径, 仅支持 ini 文件格式)
+    // 返回:
+    //      返回是否读取成功
     ErrCode Load(const std::string &filename);
 };
 

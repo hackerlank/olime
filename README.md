@@ -26,3 +26,29 @@
 
 本来是使用[glog](https://code.google.com/p/google-glog/)的, 但是由于glog过于庞大, 而我们对于日志的需求并没有想象中那么强烈,
 所以改用 easylogging++. easylogging++ 的名字真是拗口, 但是人家就叫这个也只能这样了. easylogging++需要使用 C++ 11.
+
+### 2. [dawgdic](https://code.google.com/p/dawgdic/)
+
+dawgdic 也包含一个 Python 的[封装](https://github.com/kmike/DAWG), 代码中对
+dawgdic 进行了封装, 将我们会用的功能提取出来. 有兴趣可以仔细看看 dawgdic 的代码,
+封装的代码叫做 trie.cc / trie.h
+
+
+## 字符编码规范
+
+由于我们之前使用的字符集采用了 GB18030 这种国标, 而不是使用 Unicode
+这种国际化的规范标准, 在使用的时候出现了很多不好处理的情况, 例如: debug
+的时候需要将 terminal 改成 GB18030 编码; 和 URL 一同处理的时候存在 UTF-8
+转换 GB18030 的需求.
+
+由于我们采用 C++ 11, 所以直接使用新支持的 char16_t, char32_t, u16string,
+u32string. 所以请使用新的类型和 char, string 来分别处理16bit, 32bit, 8bit
+的字符串.
+
+
+## 文档细节
+
+### 1. 数据结构
+
+1. [signdict](/docs/signdict.md)一种快速简单的 key-value 存储/查询方式.
+2. [trie](/docs/trie.md)字典树, 对 dawgdic 的封装.

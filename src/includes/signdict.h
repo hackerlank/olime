@@ -10,11 +10,11 @@ namespace dicts {
 
 // 用于 dumps 到文件时的头信息
 struct SignDictHeader {
-    uint64_t magic_num;
-    uint64_t items_num;
-    uint32_t value_bytes;
-    uint32_t sign_bytes;
-    uint32_t prefix_bytes;
+    uint64_t magic_num; // 用来判断是不是我们的文件的魔数
+    uint64_t items_num; // 条目数
+    uint32_t value_bytes; // 每个条目内容所占字节数
+    uint32_t sign_bytes; // 每个 sign 的字节数
+    uint32_t prefix_bytes; // 前缀的字节数
 };
 
 // 变长的缓存类, 定义了一些常用功能.
@@ -45,16 +45,25 @@ public:
     }
 
     // 从文件读取数据
+    // 参数:
+    //      infile: 输入文件的流对象
     void Loads(std::ifstream &infile) {
         infile.read((char*)buff_, items_num_ * item_bytes_);
     }
 
     // 写入到文件
+    // 参数:
+    //      outfile: 输出文件的流对象
     void Dumps(std::ofstream &outfile) {
         outfile.write((char*)buff_, items_num_ * item_bytes_);
     }
 
     // 获取值
+    // 参数:
+    //      item_index: 条目的下标号
+    //      item_value: 条目的值
+    // 返回:
+    //      返回错误码
     ErrCode Get(uint64_t item_index, uint8_t* item_value) {
         if (item_index > items_num_ || NULL == item_value) {
             return ErrInvalidParams;
@@ -64,6 +73,11 @@ public:
     }
 
     // 设定值
+    // 参数:
+    //      item_index: 条目的下标号
+    //      item_value: 条目的值
+    // 返回:
+    //      返回错误码
     ErrCode Set(uint64_t item_index, const uint8_t* item_value) {
         if (item_index > items_num_ || NULL == item_value) {
             return ErrInvalidParams;
@@ -73,12 +87,23 @@ public:
     }
 
     // 直接比较, 省去了复制一份的性能消耗
+    // 参数:
+    //      item_index: 被比较的条目的下标号
+    //      item_value: 参与比较的条目的值
+    // 返回:
+    //      返回比较的结果
+    //      -1 小于, 0 等于 1 大于
     int Cmp(uint64_t item_index, const uint8_t* other_value) {
         return memcmp(buff_ + item_index * item_bytes_, other_value,
                 item_bytes_);
     }
 
     // 直接返回一个 uint64_t 的数据
+    // 参数:
+    //      item_index: 条目的下标数
+    //      item_value: 条目的内容, 以 uint64_t 的类型呈现
+    // 返回:
+    //      返回错误码
     ErrCode GetUint64(uint64_t item_index, uint64_t &item_value) {
         if (item_bytes_ > 8) {
             return ErrFailure;
@@ -97,8 +122,12 @@ public:
         return ErrSuccess;
     }
 
-    // 直接插入一个 uint64_t 的数据
-    // 数据将大头存储
+    // 直接插入一个 uint64_t 的数据. 数据将大头存储
+    // 参数:
+    //      item_index: 条目的下标数
+    //      item_value: 条目的内容, 以 uint64_t 的类型呈现
+    // 返回:
+    //      返回错误码
     ErrCode SetUint64(uint64_t item_index, uint64_t item_value) {
         if (item_value > max_value_ || item_index >= items_num_) {
             return ErrInvalidParams;
@@ -142,10 +171,11 @@ public:
     SignDict();
 
     // 初始化 SignDict, 参数中的数据必须给出, 其余克通过计算获得。
-    // param[in] items_num: signdict 的总条目数
-    // param[in] value_bytes: 每个值的字节数
-    // param[in] sign_bytes: 每个 sign 的字节数
-    // param[in] prefix_bytes: 每个前缀的字节数
+    // 参数:
+    //      items_num: signdict 的总条目数
+    //      value_bytes: 每个值的字节数
+    //      sign_bytes: 每个 sign 的字节数
+    //      prefix_bytes: 每个前缀的字节数
     SignDict(uint64_t items_num, uint32_t value_bytes, uint32_t sign_bytes,
             uint32_t prefix_bytes=0);
 
@@ -155,25 +185,35 @@ public:
     // 创建一个 SignDict, 包括各种参数的计算与存储, 空间申请等.
     ErrCode Create();
 
-    // 查找 sign 是否存在, 如果存在保存到 value_ret 中.
-    // param[in] sign: 用于查找的 sign, 等效于 key.
-    // param[out] value: 存储查找到的值
+    // 查找 sign 是否存在, 如果存在保存到 value 中.
+    // 参数:
+    //      sign: 用于查找的 sign, 等效于 key.
+    //      value: 存储查找到的值
+    // 返回:
+    //      返回错误码
     ErrCode Search(const uint8_t* sign, uint8_t* value);
 
     // 插入 sign-value 到 SignDict 中. 所有的插入必须是对于 sign 有序的.
-    // param[in] sign: 用于插入的 sign, 等效于 key.
-    // param[in] value: 用于插入的 value 值.
+    // 参数:
+    //      sign: 用于插入的 sign, 等效于 key.
+    //      value: 用于插入的 value 值.
+    // 返回:
+    //      返回错误码
     ErrCode Insert(const uint8_t* sign, const uint8_t* value);
 
     // 全部插入完成后需要把 prefix_buff_ 的最后一个元素添加一个值
     void InsertFinish();
 
     // 将数据保存到文件
-    // param[in] filename: 文件名
+    // 参数:
+    //      filename: 文件名
     void Dumps(const std::string& filename);
 
     // 从文件中读取数据
-    // param[in] filename: 文件名
+    // 参数:
+    //      filename: 文件名
+    // 返回:
+    //      返回错误码
     ErrCode Loads(const std::string& filename);
 
 private:
@@ -182,22 +222,29 @@ private:
     uint64_t calcPrefixBytes() const;
 
     // 折半查找
-    // param[in] sign_suffix:  作为 key 的后缀 sign.
-    // param[in] beg_index: suffix_buff_ 中待查找的起始位置
-    // param[in] end_index: suffix_buff_ 中带查找的结束位置
-    // param[out] target_index: 如果找到用来存放找到的位置
+    // 参数:
+    //      sign_suffix:  作为 key 的后缀 sign.
+    //      beg_index: suffix_buff_ 中待查找的起始位置
+    //      end_index: suffix_buff_ 中带查找的结束位置
+    //      target_index: 如果找到用来存放找到的位置
+    // 返回:
+    //      返回错误码
     ErrCode binSearch(const uint8_t* sign_suffix, uint64_t beg_index,
             uint64_t end_index, uint64_t &target_index);
 
     // 获取给定 sign 的前后缀
-    // param[in] sign: 给定 sign
-    // param[out] prefix: 前缀的值
-    // param[out] suffix: 后缀的值
+    // 参数:
+    //      sign: 给定 sign
+    //      prefix: 前缀的值
+    //      suffix: 后缀的值
+    // 返回:
+    //      返回错误码
     void getPrefixAndSuffix(const uint8_t* sign, uint64_t &prefix,
             uint8_t* suffix);
 
     // 计算前缀缓存中每个条目的字节数
-    // return: 返回字节数
+    // 返回:
+    //      返回字节数
     uint32_t calcPrefixValueBytes() const;
 };
 

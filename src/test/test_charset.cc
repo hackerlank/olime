@@ -3,13 +3,13 @@
 
 
 int main() {
-    u16string str16;
-    u8string str8;
-    u32string str32;
-    u32string unicode_str;
+    std::u16string str16;
+    std::string str8;
+    std::u32string str32;
+    std::u32string unicode_str;
 
     ErrCode result;
-    u32char buff32[kMaxStrLen] = {0};
+    char32_t buff32[kMaxStrLen] = {0};
     buff32[0] = 0x20C30;
     unicode_str.assign(buff32);
 
@@ -55,7 +55,7 @@ int main() {
     result = tools::charset::UnicodeToUtf8(unicode_str, str8);
     std::cout << "Result: " << result << " " << std::endl;
     for (size_t i = 0; i < str8.length(); ++i) {
-        std::cout << "8: " << std::hex << (uint32_t)str8[i] << std::endl;
+        std::cout << "8: " << std::hex << static_cast<uint32_t>((unsigned char)str8[i]) << std::endl;
     }
     std::cout << std::endl;
 
@@ -87,7 +87,7 @@ int main() {
     result = tools::charset::UnicodeToUtf32(unicode_str, str32, false);
     std::cout << "Result: " << result << std::endl;
     for (size_t i = 0; i < str32.length(); ++i) {
-        std::cout << "32le: " << std::hex << str32[i] << std::endl;
+        std::cout << "32le: " << std::hex << static_cast<uint32_t>(str32[i]) << std::endl;
     }
     std::cout << std::endl;
 
