@@ -33,6 +33,10 @@ dawgdic 也包含一个 Python 的[封装](https://github.com/kmike/DAWG), 代�
 dawgdic 进行了封装, 将我们会用的功能提取出来. 有兴趣可以仔细看看 dawgdic 的代码,
 封装的代码叫做 trie.cc / trie.h
 
+### 3. [msgpack](http://msgpack.org/)
+
+msgpack 是一个序列化工具, 可以序列话各种类型的对象, 包括你自己设计的.
+
 
 ## 字符编码规范
 
