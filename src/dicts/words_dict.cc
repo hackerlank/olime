@@ -242,24 +242,27 @@ bool dicts::WordsDict::Load(const std::string& trie_file,
     return true;
 }
 
-/*
-bool dicts::WordsDict::PrefixGetIds(const std::u32string& pron, uint32_t beg_index,
-        std::vector< std::tuple< uint32_t, uint32_t, std::vector<uint32_t> > >& ids) {
+bool dicts::WordsDict::PrefixGetIds(const std::u32string& pron,
+        std::map<uint32_t, uint32_t>& ids) {
 
     dawgdic::BaseType index = trie_->root();
+    uint32_t beg_index = 0;
     for (uint32_t end_index = 1; end_index <= pron.length(); ++end_index) {
+        // 本次新增的字符
         std::u32string part = pron.substr(beg_index, end_index - beg_index);
         trie_->Follow(part.c_str(), &index);
         if (trie_->has_value(index)) {
-            std::string u8;
-            tools::charset::UnicodeToUtf8(pron.substr(beg_index, end_index - beg_index), u8);
-            std::cout << "[" << beg_index << ":" << end_index << "] " << u8 << "\t" << trie_->value(index) << std::endl;
-
+            // 获取该发音下的所有 id
+            uint32_t offset = trie_->value(index);
+            std::vector<uint32_t>& cur_ids = (*ids_list_)[offset];
+            // 保存至 ids 中
+            for (std::vector<uint32_t>::iterator it = cur_ids.begin();
+                    it != cur_ids.end(); ++it) {
+                ids[*it] = end_index;
+            }
+            // 下一轮
             beg_index = end_index;
         }
     }
     return true;
 }
-*/
-
-

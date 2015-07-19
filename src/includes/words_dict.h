@@ -8,6 +8,7 @@ namespace dicts {
 
 
 struct Word {
+    // 用来存储 "词" 的结构体
 
     // 词条内容
     std::u32string word_;
@@ -27,7 +28,7 @@ struct Word {
     Word(const std::u32string& word, uint32_t cls, uint32_t cost) :
         word_(word), cls_(cls), cost_(cost) {}
 
-    // 深 copy
+    // deep copy
     Word& operator=(const Word& other) {
         word_ = other.word_;
         cls_ = other.cls_;
@@ -55,7 +56,7 @@ public:
     // 析构函数
     ~WordsDict();
 
-    // 建立词典 (可以选择是否要建立引导)
+    // 建立词典, 只使用了 trie 树部分, dawgdic 实际上还支持 complete 功能
     // 参数:
     //      is: 输入文本,  必须使用 UTF-8 编码, 格式为
     //          发音 [\tab] 词条 [\tab] 词性 id [\tab] cost
@@ -104,17 +105,15 @@ public:
         const std::string& words_file, const std::string& ids_file);
 
     // 前缀查找, 例如:
-    //      完整 key 为 abcde, 会查找: a, ab, abc, abcd, abcde 下包含的 value
-    //      返回的结果则是 {"a": 1, "ab": 2, ...}
+    //      完整发音为 abcde, 会查找: a, ab, abc, abcd, abcde 下包含的词
+    //      返回的结果则是 {词1:  词1发音长度,  词2:  词2发音长度, ...}
     // 参数:
-    //      key: Unicode 的完整 key
-    //      values: 找到的 key-value 对
+    //      pron: Unicode 的完整发音
+    //      ids: 词-发音长度的 pair
     // 返回:
     //      返回是否找到了结果
-    /*
     bool PrefixGetIds(const std::u32string& pron,
-            std::vector< std::tuple< uint32_t, uint32_t, std::vector<uint32_t> > >& ids);
-    */
+            std::map<uint32_t, uint32_t>& ids);
 };
 
 

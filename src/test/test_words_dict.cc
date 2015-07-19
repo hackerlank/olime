@@ -51,6 +51,18 @@ int main() {
     tools::charset::UnicodeToUtf8(word.word_, u8word);
     std::cout << "word: " << u8word << " cls: " << word.cls_ << " cost: " << word.cost_ << std::endl;
 
+    // prefix get ids
+    std::map<uint32_t, uint32_t> prefix_ids;
+    d2.PrefixGetIds(pron, prefix_ids);
+    std::cout << "size: " << prefix_ids.size() << std::endl;
+    for (std::map<uint32_t, uint32_t>::iterator it = prefix_ids.begin();
+            it != prefix_ids.end(); ++it) {
+        uint32_t id = it->first;
+        uint32_t end_pos = it->second;
+        d2.GetWord(id, word);
+        tools::charset::UnicodeToUtf8(word.word_, u8word);
+        std::cout << id << ", " << end_pos << " word: " << u8word << " cls: " << word.cls_ << " cost: " << word.cost_ << std::endl;
+    }
 
 
 
