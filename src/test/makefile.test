@@ -2,12 +2,13 @@ include ../makefile.d
 
 OBJECTS_NAME := $(wildcard $(OBJECTS_DIR)/*.o)
 
-test: release test_config.exe test_charset.exe test_log.exe test_signdict.exe test_words_dict.exe
+#test: release test_config.exe test_charset.exe test_log.exe test_signdict.exe test_words_dict.exe
+test: release test_charset.exe test_config.exe
 
 release:
 	@if [ ! -d $(TEST_RELEASE_DIR) ]; then mkdir $(TEST_RELEASE_DIR); fi
 	@cp test_data/* $(TEST_RELEASE_DIR)
 
 # 定义一个规则用于所有 .exe 文件的生成
-%.exe: %.cc $(OBJECTS_NAME)
-	@$(CC) $(CPPFLAGS) $(INCLUDES) $(OBJECTS) $< -o $(TEST_RELEASE_DIR)/$@ $(OBJECTS_NAME)
+%.exe: %.cc
+	@$(CC) $(CPPFLAGS) $(INCLUDES) $< $(OBJECTS_NAME) -o $(TEST_RELEASE_DIR)/$@

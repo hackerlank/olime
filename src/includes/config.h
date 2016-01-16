@@ -14,7 +14,6 @@
 
 #include <string>
 #include <map>
-#include "define.h"
 
 
 namespace tools {
@@ -40,7 +39,7 @@ private:
     //      invalid_chars: 定义为无效的字符
     // 返回:
     //      返回已经去除首尾无效字符的字符串
-    std::string Trim(const std::string& src_str, const std::string& invalid_chars="\t\n ");
+    std::string strip(const std::string& src_str, const std::string& invalid_chars="\t\n ");
 
 public:
 
@@ -57,7 +56,7 @@ public:
     //      filename: 文件名称 (包含路径, 仅支持 ini 文件格式)
     // 返回:
     //      返回是否读取成功
-    ErrCode Load(const std::string &filename);
+    bool Load(const std::string &filename);
 };
 
 

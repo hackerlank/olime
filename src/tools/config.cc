@@ -5,7 +5,8 @@ namespace tools {
 namespace config {
 
 
-std::string Parser::Trim(const std::string& src_str, const std::string& invalid_chars) {
+std::string Parser::strip(const std::string& src_str,
+                          const std::string& invalid_chars) {
     size_t beg_index = src_str.find_first_not_of(invalid_chars);
     size_t end_index = src_str.find_last_not_of(invalid_chars);
     if (std::string::npos == beg_index || std::string::npos == end_index) {
@@ -16,10 +17,10 @@ std::string Parser::Trim(const std::string& src_str, const std::string& invalid_
 }
 
 
-ErrCode Parser::Load(const std::string& ini_filename) {
+bool Parser::Load(const std::string& ini_filename) {
     std::fstream f_ini(ini_filename.c_str());
     if (! f_ini) {
-        return ErrInternalErr;
+        return false;
     }
 
     std::string line;
@@ -31,14 +32,14 @@ ErrCode Parser::Load(const std::string& ini_filename) {
             line = line.substr(0, sharp_index);
         }
 
-        line = Trim(line);
+        line = strip(line);
 
         if (line[0] == '#') { // 注释
             continue;
         } else if ('[' == line[0] && ']' == line[line.length() - 1] &&
                 line.length() - 1 == line.find_first_of("[]", 1)) { // section
             section = line.substr(1, line.length() - 2);
-            section = Trim(section);
+            section = strip(section);
             if (section_dict_.end() == section_dict_.find(section)) {
                 section_dict_[section] = std::map<std::string, std::string>();
             }
@@ -49,15 +50,15 @@ ErrCode Parser::Load(const std::string& ini_filename) {
             }
             std::string key = line.substr(0, equal_index);
             std::string value = line.substr(equal_index + 1, line.length() - equal_index - 1);
-            key = Trim(key);
-            value = Trim(value);
+            key = strip(key);
+            value = strip(value);
             section_dict_[section][key] = value;
         }
 
     }
 
     f_ini.close();
-    return ErrSuccess;
+    return true;
 }
 
 
